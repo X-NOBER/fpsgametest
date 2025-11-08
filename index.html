@@ -1,0 +1,69 @@
+<script>
+(function () {
+  // ---------- CONFIG ----------
+  const triggerKey = "F"; // key to open the page
+  const remoteHtml = "https://cdn.jsdelivr.net/gh/X-NOBER/fpsgametest@main/index2.html"; // correct file path
+  const repoBase = "https://cdn.jsdelivr.net/gh/X-NOBER/fpsgametest@main/"; // used for <base>
+  const customTitle = "FPS Game"; // tab title
+  const customFavicon = "https://cdn.jsdelivr.net/gh/X-NOBER/fpsgametest@main/favicon.ico"; // favicon
+  // ----------------------------
+
+  window.addEventListener("keydown", async function onKey(e) {
+    const active = document.activeElement;
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
+
+    if (e.key === triggerKey) {
+      const w = window.open("about:blank", "_blank");
+      if (!w) {
+        alert("Popup blocked! Please allow pop-ups for this site.");
+        return;
+      }
+
+      try {
+        const res = await fetch(remoteHtml, { cache: "no-cache" });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        let html = await res.text();
+
+        // Inject <base> tag if missing
+        if (!/<base\s/i.test(html)) {
+          if (/<head[\s\S]*?>/i.test(html)) {
+            html = html.replace(/<head([\s\S]*?)>/i, (m) => m + `\n<base href="${repoBase}">`);
+          } else {
+            html = `<!DOCTYPE html><head><base href="${repoBase}"></head>` + html;
+          }
+        }
+
+        // Write HTML into new tab
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+
+        // Set custom title
+        try { w.document.title = customTitle; } catch {}
+
+        // Add custom favicon
+        try {
+          const link = w.document.createElement("link");
+          link.rel = "icon";
+          link.href = customFavicon;
+          w.document.head.appendChild(link);
+        } catch (err) {
+          console.warn("Failed to set favicon:", err);
+        }
+
+        w.focus();
+      } catch (err) {
+        try {
+          w.document.open();
+          w.document.write(`<pre style="white-space:pre-wrap;padding:10px;">Failed to load remote HTML:\n${err}</pre>`);
+          w.document.close();
+          w.focus();
+        } catch (e) {
+          console.error("Failed to write error to opened tab:", e);
+        }
+        console.error("Load error:", err);
+      }
+    }
+  }, false);
+})();
+</script>
