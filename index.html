@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>FPS Game Test</title>
+
+    <!-- Styles -->
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
+
+    <script>
+      var unityInstance = null;
+    </script>
+
+    <style>
+      body {
+        background-color: #111;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #unity-container {
+        width: 960px;
+        height: 600px;
+        position: relative;
+      }
+      #unity-loading-bar {
+        width: 100%;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: center;
+      }
+      #unity-logo {
+        width: 128px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+      #unity-progress-bar-empty,
+      #unity-progress-bar-full {
+        height: 20px;
+        border-radius: 5px;
+        display: inline-block;
+      }
+      #unity-progress-bar-empty {
+        width: 70%;
+        background: url('TemplateData/progress-bar-empty-dark.png') no-repeat center;
+        background-size: 100% 100%;
+      }
+      #unity-progress-bar-full {
+        width: 0%;
+        background: url('TemplateData/progress-bar-full-dark.png') no-repeat center;
+        background-size: 100% 100%;
+      }
+      #unity-footer {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <img id="unity-logo" src="TemplateData/unity-logo-dark.png" alt="Unity Logo" />
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-footer">
+        <p>FPS Game Test - Powered by Unity WebGL</p>
+      </div>
+    </div>
+
+    <script src="Build/Fpsgame.loader.js"></script>
+    <script>
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "Build/Fpsgame.data.gz",
+        frameworkUrl: "Build/Fpsgame.framework.js.gz",
+        codeUrl: "Build/Fpsgame.wasm.gz",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "YourCompany",
+        productName: "FPS Game",
+        productVersion: "1.0",
+      }, (progress) => {
+        document.querySelector("#unity-progress-bar-full").style.width = (100 * progress) + "%";
+      }).then((instance) => {
+        unityInstance = instance;
+        document.querySelector("#unity-loading-bar").style.display = "none";
+      }).catch((message) => {
+        alert("Failed to load game.\n" + message);
+      });
+    </script>
+  </body>
+</html>
